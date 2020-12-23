@@ -1,0 +1,10 @@
+{:deps {:aliases [:dev]}
+ 
+ ; If you use deps, remove `:source-paths` and `:dependencies` from this file
+ 
+ :builds       {:app {:target           :react-native
+                      :init-fn          pokedex.app/init
+                      :output-dir       "app"
+                      :compiler-options {:infer-externs :auto}
+                      :devtools         {:autoload true
+                                         :preloads [shadow.expo.keep-awake]}}}}
