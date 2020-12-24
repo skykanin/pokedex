@@ -19,5 +19,10 @@
       [:> rn/SafeAreaView {:style (:container style)}
        [:> rn/FlatList
         {:data @pokemons
+         :get-item-layout
+         (fn [_ index]
+           (clj->js {:length 120 :offset (* 120 index) :index index}))
+         :initial-num-to-render 6
          :render-item render-card
-         :key-extractor (fn [item-obj] (str (.-id item-obj)))}]])))
+         :key-extractor
+         (fn [item-obj] (str (.-id item-obj)))}]])))

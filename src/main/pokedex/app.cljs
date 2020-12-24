@@ -13,5 +13,5 @@
 
 (defn init []
   (rf/dispatch-sync [::events/initialise-db])
-  (rf/dispatch [::events/fetch-pokemons :limit 80 :offset 500])
+  (rf/dispatch [::events/fetch-pokemons :limit 100 :offset 400])
   (start))
