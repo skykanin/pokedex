@@ -1,8 +1,8 @@
 {:paths ["src/main" "src/test"]
 
- :deps {cljs-http/cljs-http {:mvn/version "0.1.46"}
-        reagent {:mvn/version "1.0.0-alpha2"}
+ :deps {reagent {:mvn/version "1.0.0-alpha2"}
         re-frame {:mvn/version "1.1.2"}
+        superstructor/re-frame-fetch-fx {:mvn/version "0.1.0"}
         thheller/shadow-cljs {:mvn/version "2.11.8"}}
 
  :aliases {:dev {:extra-paths ["src/test" "src/dev"]}}}

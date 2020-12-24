@@ -1,12 +1,10 @@
 (ns pokedex.events
-  (:require-macros [cljs.core.async :refer [go]])
   (:require
-   [cljs.core.async :refer [<! take!]]
-   [cljs-http.client :as http]
    ; [clojure.spec.alpha :as s]
    ; [day8.re-frame.http-fx-alpha]
    [pokedex.db :refer [app-db]]
-   [re-frame.core :refer [dispatch reg-event-db reg-event-fx reg-fx after]]))
+   [re-frame.core :refer [dispatch reg-event-db reg-event-fx reg-fx after]]
+   [superstructor.re-frame.fetch-fx]))
 
 ;; -- Interceptors ------------------------------------------------------------
 ;;
@@ -31,26 +29,41 @@
  (fn [_ _]
    app-db))
 
-(reg-event-db
- ::add-pokemon
- (fn [db [_ pokemon]]
-   (update db :list conj pokemon)))
-
 (reg-event-fx
  ::fetch-pokemons
  (fn [_ [_ & params]]
-   {:fetch-pokemons (apply hash-map params)}))
+   {:fetch
+    {:method :get
+     :url "https://pokeapi.co/api/v2/pokemon"
+     :response-content-types {#"application/.*json" :json}
+     :params (apply hash-map params)
+     :on-success [:fetch-pokemon]}}))
 
-(defn fetch-pokemons [params]
-  (go
-    (let [result (<! (http/get "https://pokeapi.co/api/v2/pokemon"
-                               {:query-params params}))
-          data (:results (:body result))
-          callback #(dispatch [::add-pokemon (:body %)])]
-      (doseq [url (map :url data)]
-        (take! (http/get url) callback)))))
+(defn create-req [url]
+  [:fetch
+   {:method :get
+    :url url
+    :response-content-types {#"application/.*json" :json}
+    :on-success [:insert-pokemon]
+    :on-failure [:log]}])
+
+(reg-event-fx
+ :log
+ (fn [_ [_ to-log]]
+   {:pprint to-log}))
 
 (reg-fx
- :fetch-pokemons
- (fn [query-params]
-   (fetch-pokemons query-params)))
+ :pprint
+ (fn [to-print]
+   (cljs.pprint/pprint to-print)))
+
+(reg-event-fx
+ :fetch-pokemon
+ (fn [_ [_ {:keys [body]}]]
+   {:fx (mapv (comp create-req :url) (:results body))}))
+
+(reg-event-db
+ :insert-pokemon
+ (fn [db [_ response]]
+   (let [pokemon (:body response)]
+     (update db :list conj pokemon))))
