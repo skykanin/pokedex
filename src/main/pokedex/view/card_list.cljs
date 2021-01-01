@@ -6,23 +6,34 @@
    [reagent.core :as r]
    [pokedex.subs :as subs]))
 
-(def style
-  {:container {:flex 1}})
+(def styles
+  {:separator {:height 10
+               :width "100%"}})
 
 (defn render-card [obj]
-  (let [item (js->clj (.-item obj) :keywordize-keys true)]
-    (r/as-element [info-card item])))
+  (let [item (.-item obj)]
+    (r/as-element [info-card (assoc item :index (.-index obj))])))
+
+(defn- seperator []
+  [:> rn/View {:style (:separator styles)}])
+
+(defn- convert-to-array [vec]
+  (let [arr #js []]
+    (doseq [x vec]
+      (.push arr x))
+    arr))
 
 (defn card-list []
-  (let [pokemons (rf/subscribe [::subs/get-pokemon])]
-    (fn []
-      [:> rn/SafeAreaView {:style (:container style)}
-       [:> rn/FlatList
-        {:data @pokemons
-         :get-item-layout
-         (fn [_ index]
-           (clj->js {:length 120 :offset (* 120 index) :index index}))
-         :initial-num-to-render 6
-         :render-item render-card
-         :key-extractor
-         (fn [item-obj] (str (.-id item-obj)))}]])))
+  (r/create-element
+    rn/FlatList
+    #js {:data (convert-to-array
+                @(rf/subscribe
+                  [::subs/get-pokemon [:id :name :types :sprites]]))
+         :getItemLayout (fn [_ index]
+                          #js {:length 100
+                               :offset (* 100 index) :index index})
+         :initialNumToRender 7
+         :ItemSeparatorComponent (r/reactify-component seperator)
+         :keyExtractor (fn [item-obj _] (str (:id item-obj)))
+         :progressViewOffset true
+         :renderItem render-card}))
