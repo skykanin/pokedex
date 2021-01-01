@@ -9,9 +9,9 @@
 (defn start
   {:dev/after-load true}
   []
-  (expo/render-root (r/as-element [home #_{:x (js/Date.now)}])))
+  (expo/render-root (r/as-element [home {:x (js/Date.now)}])))
 
 (defn init []
   (rf/dispatch-sync [::events/initialise-db])
-  (rf/dispatch [::events/fetch-pokemons :limit 100 :offset 400])
+  (rf/dispatch [::events/fetch-pokemons :limit 100 :offset 200])
   (start))
