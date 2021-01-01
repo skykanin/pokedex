@@ -3,6 +3,10 @@
 
 (reg-sub
  ::get-pokemon
- (fn [db _]
+ (fn [db [_ keys]]
    (when-let [pokemons (seq (:list db))]
-     (sort-by :id pokemons))))
+     (->> pokemons
+          (sort-by :id)
+          (map #(-> %
+                    (select-keys keys)
+                    (assoc :length (count pokemons))))))))
