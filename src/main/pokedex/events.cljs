@@ -1,28 +1,9 @@
 (ns pokedex.events
   (:require
-   ; [clojure.spec.alpha :as s]
-   ; [day8.re-frame.http-fx-alpha]
+   [cljs.pprint :refer [pprint]]
    [pokedex.db :refer [app-db]]
-   [re-frame.core :refer [dispatch reg-event-db reg-event-fx reg-fx after]]
+   [re-frame.core :refer [reg-event-db reg-event-fx reg-fx]]
    [superstructor.re-frame.fetch-fx]))
-
-;; -- Interceptors ------------------------------------------------------------
-;;
-;; See https://github.com/Day8/re-frame/blob/master/docs/Interceptors.md
-;;
-;; (defn check-and-throw
-;;   "Throw an exception if db doesn't have a valid spec."
-;;   [spec db [event]]
-;;   (when-not (s/valid? spec db)
-;;     (let [explain-data (s/explain-data spec db)]
-;;       (throw (ex-info (str "Spec check after " event " failed: " explain-data) explain-data))]))
-;;
-;; (def validate-spec
-;;   (if goog.DEBUG
-;;     (after (partial check-and-throw ::db/app-db))
-;;     []]))
-
-;; -- Handlers --------------------------------------------------------------
 
 (reg-event-db
  ::initialise-db
@@ -55,7 +36,7 @@
 (reg-fx
  :pprint
  (fn [to-print]
-   (cljs.pprint/pprint to-print)))
+   (pprint to-print)))
 
 (reg-event-fx
  :fetch-pokemon
