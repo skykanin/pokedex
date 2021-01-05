@@ -4,7 +4,9 @@
    ["@react-navigation/native" :as n]
    ["@react-navigation/stack" :as stack]
    [pokedex.view.card-list :refer [card-list]]
-   [reagent.core :as r]))
+   [pokedex.view.info-component :refer [info-component]]
+   [reagent.core :as r]
+   [clojure.string :as s]))
 
 (def header-style
   {:header-status-bar-height (.-statusBarHeight c/default)
@@ -27,4 +29,9 @@
                   :screen-options header-style}
     [:> Screen {:name "Home"
                 :component (r/reactify-component card-list)
-                :options {:title "Pokédex"}}]]])
+                :options {:title "Pokédex"}}]
+    [:> Screen {:name "Details"
+                :component (r/reactify-component info-component)
+                :options (fn [^js/Object obj]
+                           (let [name (s/capitalize (.. obj -route -params -name))]
+                             #js {:title name}))}]]])

@@ -1,6 +1,8 @@
 (ns pokedex.view.info-card
   (:require
    [clojure.string :as s]
+   [pokedex.view.image :refer [image]]
+   [pokedex.view.util.type :refer [type->colour]]
    ["react-native" :as rn]))
 
 (def styles
@@ -47,26 +49,6 @@
           {:width (- 100 safepad)
            :height (- 100 safepad)})})
 
-(def type->colour
-  {"unknown" "#68a090"
-   "bug" "#a8b820"
-   "dark" "#705848"
-   "dragon" "#7038f8"
-   "electric" "#f8d030"
-   "fairy" "#ee99ac"
-   "fighting" "#c03028"
-   "fire" "#f08030"
-   "flying" "#a890f0"
-   "ghost" "#705898"
-   "grass" "#78c850"
-   "ground" "#e0c068"
-   "ice" "#98d8d8"
-   "normal" "#a8a878"
-   "poison" "#a040a0"
-   "psychic" "#f85888"
-   "rock" "#b8a038"
-   "steel" "#b8b8d0"
-   "water" "#6890f0"})
 
 (defn- render-id [id]
  (cond
@@ -88,24 +70,21 @@
        (into [:> rn/View
               {:style (:type-view styles)}])))
 
-(defn- image [style sprites]
-  [:> rn/View style
-   [:> rn/Image
-    {:style (:img styles)
-     :source {:uri (:front_default sprites)}}]])
-
 (defn modify-style [index type length style-map]
   (cond-> style-map
     (zero? index) (assoc :margin-top 10)
     (= index (dec length)) (assoc :margin-bottom 10)
     true (assoc :background-color (type->colour type))))
 
-(defn info-card [{:keys [id index length name types sprites]}]
-  [:> rn/View {:style (modify-style index
-                                 (first (map (comp :name :type) types))
-                                 length
-                                 (:info-card styles))}
-   [:> rn/View {:style (:info-view styles)}
-    [text-data id name]
-    [type-container types]]
-   [image {:style (:img-view styles)} sprites]])
+(defn info-card [{:keys [id index length name navigation types sprites]}]
+  [:> rn/TouchableOpacity
+   {:on-press
+    (fn [] (. navigation push "Details" #js {:id id :name name}))}
+   [:> rn/View {:style (modify-style index
+                                     (first (map (comp :name :type) types))
+                                     length
+                                     (:info-card styles))}
+    [:> rn/View {:style (:info-view styles)}
+     [text-data id name]
+     [type-container types]]
+    [image (:img-view styles) (:img styles) sprites]]])
