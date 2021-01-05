@@ -11,12 +11,13 @@
 (def header-style
   {:header-status-bar-height (.-statusBarHeight c/default)
    :header-style {:background-color :#fa0808
-                  :height (+ 30 (.-statusBarHeight c/default))}
+                  :height (+ 40 (.-statusBarHeight c/default))}
    :header-tint-color :black
    :header-title-style {:font-size 25
-                        :font-weight :bold}
-   :header-title-container-style {:align-items :flex-start
-                                  :padding-bottom 15}})
+                        :font-weight :bold
+                        :padding-bottom 15}
+   :header-left-container-style {:padding-bottom 10}
+   :header-title-align :left})
 
 (defonce s (stack/createStackNavigator))
 
@@ -34,4 +35,5 @@
                 :component (r/reactify-component info-component)
                 :options (fn [^js/Object obj]
                            (let [name (s/capitalize (.. obj -route -params -name))]
-                             #js {:title name}))}]]])
+                             #js {:title name
+                                  :headerTitleAlign :center}))}]]])
