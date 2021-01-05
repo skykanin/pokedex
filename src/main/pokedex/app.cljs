@@ -9,7 +9,8 @@
 (defn start
   {:dev/after-load true}
   []
-  (expo/render-root (r/as-element [home {:x (js/Date.now)}])))
+  (expo/render-root
+   (r/as-element [home {:x (js/Date.now)}])))
 
 (defn init []
   (rf/dispatch-sync [::events/initialise-db])
