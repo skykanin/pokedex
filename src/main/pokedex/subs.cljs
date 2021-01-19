@@ -4,7 +4,7 @@
 (reg-sub
  ::get-pokemons
  (fn [db [_ keys]]
-   (when-let [pokemons (seq (:list db))]
+   (when-let [pokemons (seq (:pokemons db))]
      (->> pokemons
           (sort-by :id)
           (map #(-> %
@@ -17,5 +17,11 @@
 (reg-sub
  ::get-pokemon
  (fn [db [_ id keys]]
-   (when-let [pokemon (lookup-id id (:list db))]
+   (when-let [pokemon (lookup-id id (:pokemons db))]
      (select-keys pokemon keys))))
+
+(reg-sub
+ ::get-specie
+ (fn [db [_ id keys]]
+   (when-let [specie (lookup-id id (:species db))]
+     (select-keys specie keys))))

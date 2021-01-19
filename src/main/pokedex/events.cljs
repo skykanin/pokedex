@@ -18,7 +18,24 @@
      :url "https://pokeapi.co/api/v2/pokemon"
      :response-content-types {#"application/.*json" :json}
      :params (apply hash-map params)
-     :on-success [:fetch-pokemon]}}))
+     :on-success [:fetch-pokemon]
+     :on-failure [:log]}}))
+
+(reg-event-fx
+ ::fetch-pokemon-specie
+ (fn [_ [_ id]]
+   {:fetch
+    {:method :get
+     :url (str "https://pokeapi.co/api/v2/pokemon-species/" id)
+     :response-content-types {#"application/.*json" :json}
+     :on-success [:insert-specie]
+     :on-failure [:log]}}))
+
+(reg-event-db
+ :insert-specie
+ (fn [db [_ response]]
+   (let [specie (:body response)]
+     (update db :species conj specie))))
 
 (defn create-req [url]
   [:fetch
@@ -47,4 +64,4 @@
  :insert-pokemon
  (fn [db [_ response]]
    (let [pokemon (:body response)]
-     (update db :list conj pokemon))))
+     (update db :pokemons conj pokemon))))

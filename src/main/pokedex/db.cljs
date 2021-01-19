@@ -9,4 +9,5 @@
 ;; initial state of app-db
 
 (def app-db
-  {:list []})
+  {:pokemons []
+   :species []})
