@@ -1,6 +1,7 @@
 (ns pokedex.view.info.abilities-info
   (:require [clojure.string :as s]
             [pokedex.view.info.info-container :refer [info-container]]
+            [pokedex.view.info.util :refer [spacer-bar]]
             [pokedex.view.util.type :refer [modify-style]]
             ["react-native" :as rn]))
 
@@ -10,13 +11,13 @@
                       :border-radius 12
                       :border-width 1
                       :height 35
-                      :margin-bottom 10}
+                      :overflow :hidden}
    :ability-text {:font-size 18
                   :text-align :center
                   :text-align-vertical :center}
    :hidden-style  {:flex 1
                    :border-color :black
-                   :border-right-width 1
+                   :border-right-width 2
                    :border-top-left-radius 12
                    :border-bottom-left-radius 12
                    :justify-content :center
@@ -28,7 +29,7 @@
    :ability-cover {:flex 1
                    :align-self :stretch
                    :justify-content :center
-                   :width "100%"}})
+                   :margin-left -1}})
 
 (defn- render-ability [name]
   (s/join " " (map s/capitalize (s/split name #"-"))))
@@ -54,4 +55,5 @@
   "Abilities information component which renders pokémons abilities"
   [type abilities]
   (into [info-container]
-        (map (partial ability-bar type) abilities)))
+        (interpose [spacer-bar 10]
+                   (map (partial ability-bar type) abilities))))
