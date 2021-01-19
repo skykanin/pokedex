@@ -4,7 +4,6 @@
 (def ^:private container-style
   {:flex 2
    :align-items :center
-   :align-self :stretch
    :background-color :white
    :padding 10
    :margin-vertical 10
