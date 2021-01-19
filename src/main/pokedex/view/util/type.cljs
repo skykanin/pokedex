@@ -20,3 +20,6 @@
    "rock" "#b8a038"
    "steel" "#b8b8d0"
    "water" "#6890f0"})
+
+(defn modify-style [style-map type]
+  (assoc style-map :background-color (type->colour type)))
