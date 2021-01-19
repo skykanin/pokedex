@@ -1,4 +1,5 @@
 (ns pokedex.app
+  "Application entry point module."
   (:require
    [pokedex.view.home :refer [home]]
    [reagent.core :as r]
