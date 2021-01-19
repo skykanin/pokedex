@@ -27,26 +27,33 @@
               :height 175
               :justify-content :center
               :align-items :center}
-   :info-list {}})
+   :info-list {:width "100%"}})
 
-(def key-list
+(def ^:private pokemon-keys
   [:abilities :id :name :height :weight :sprites :stats :moves :types])
 
-(defn sub [id]
-  @(rf/subscribe [::subs/get-pokemon id key-list]))
+(def ^:private specie-keys
+  [:flavor_text_entries])
 
-(defn image-face [attrs image-component]
+(defn- sub-pokemon [id]
+  @(rf/subscribe [::subs/get-pokemon id pokemon-keys]))
+
+(defn- sub-specie [id]
+  @(rf/subscribe [::subs/get-specie id specie-keys]))
+
+(defn- image-face [attrs image-component]
   [:> rn/View attrs image-component])
 
 (defn info-component [{:keys [route]}]
-  (let [id (.. route -params -id)
-        {:keys [abilities types sprites stats weight height]} (sub id)]
-    (fn []
-      (let [type (first (map (comp :name :type) types))]
-        [:> rn/View {:style (modify-style (:container styles) type)}
-         [image-face {:style (:img-face styles)}
-          [image (:img-view styles) (:img styles) sprites]]
-         [:> rn/ScrollView {:style (:info-list styles)}
-          [species-info weight height]
-          [abilities-info type abilities]
-          [base-stats-info type stats]]]))))
+  (fn []
+    (let [id (.. route -params -id)
+          {:keys [abilities types sprites stats weight height]} (sub-pokemon id)
+          {flavour-text-entries :flavor_text_entries} (sub-specie id)
+          type (first (map (comp :name :type) types))]
+     [:> rn/View {:style (modify-style (:container styles) type)}
+      [image-face {:style (:img-face styles)}
+       [image (:img-view styles) (:img styles) sprites]]
+      [:> rn/ScrollView {:style (:info-list styles)}
+       [species-info flavour-text-entries weight height]
+       [abilities-info type abilities]
+       [base-stats-info type stats]]])))

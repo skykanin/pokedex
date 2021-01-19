@@ -3,7 +3,9 @@
    [clojure.string :as s]
    [pokedex.view.image :refer [image]]
    [pokedex.view.util.type :refer [type->colour]]
-   ["react-native" :as rn]))
+   ["react-native" :as rn]
+   [re-frame.core :as rf]
+   [pokedex.events :as events]))
 
 (def styles
   {:info-card {:flex 1
@@ -78,8 +80,9 @@
 
 (defn info-card [{:keys [id index length name navigation types sprites]}]
   [:> rn/TouchableOpacity
-   {:on-press
-    (fn [] (. navigation push "Details" #js {:id id :name name}))}
+   {:on-press (fn []
+                (rf/dispatch [::events/fetch-pokemon-specie id])
+                (. navigation push "Details" #js {:id id :name name}))}
    [:> rn/View {:style (modify-style index
                                      (first (map (comp :name :type) types))
                                      length
