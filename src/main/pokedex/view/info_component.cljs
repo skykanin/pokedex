@@ -2,6 +2,7 @@
   (:require [pokedex.subs :as subs]
             [pokedex.view.image :refer [image]]
             [pokedex.view.info.abilities-info :refer [abilities-info]]
+            [pokedex.view.info.base-stats :refer [base-stats-info]]
             [pokedex.view.info.species-info :refer [species-info]]
             [pokedex.view.util.type :refer [modify-style]]
             ["react-native" :as rn]
@@ -25,10 +26,11 @@
               :width 175
               :height 175
               :justify-content :center
-              :align-items :center}})
+              :align-items :center}
+   :info-list {}})
 
 (def key-list
-  [:abilities :id :name :height :weight :sprites :moves :types])
+  [:abilities :id :name :height :weight :sprites :stats :moves :types])
 
 (defn sub [id]
   @(rf/subscribe [::subs/get-pokemon id key-list]))
@@ -38,11 +40,13 @@
 
 (defn info-component [{:keys [route]}]
   (let [id (.. route -params -id)
-        {:keys [abilities types sprites weight height]} (sub id)]
+        {:keys [abilities types sprites stats weight height]} (sub id)]
     (fn []
       (let [type (first (map (comp :name :type) types))]
         [:> rn/View {:style (modify-style (:container styles) type)}
          [image-face {:style (:img-face styles)}
           [image (:img-view styles) (:img styles) sprites]]
-         [species-info weight height]
-         [abilities-info type abilities]]))))
+         [:> rn/ScrollView {:style (:info-list styles)}
+          [species-info weight height]
+          [abilities-info type abilities]
+          [base-stats-info type stats]]]))))
