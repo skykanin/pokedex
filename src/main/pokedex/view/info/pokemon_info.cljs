@@ -1,9 +1,10 @@
-(ns pokedex.view.info-component
+(ns pokedex.view.info.pokemon-info
   (:require [pokedex.subs :as subs]
             [pokedex.view.image :refer [image]]
             [pokedex.view.info.abilities-info :refer [abilities-info]]
             [pokedex.view.info.base-stats :refer [base-stats-info]]
             [pokedex.view.info.species-info :refer [species-info]]
+            [pokedex.view.skeleton :refer [skeleton]]
             [pokedex.view.util.type :refer [modify-style]]
             ["react-native" :as rn]
             [re-frame.core :as rf]))
@@ -44,16 +45,25 @@
 (defn- image-face [attrs image-component]
   [:> rn/View attrs image-component])
 
-(defn info-component [{:keys [route]}]
-  (fn []
-    (let [id (.. route -params -id)
-          {:keys [abilities types sprites stats weight height]} (sub-pokemon id)
-          {flavour-text-entries :flavor_text_entries} (sub-specie id)
-          type (first (map (comp :name :type) types))]
-     [:> rn/View {:style (modify-style (:container styles) type)}
-      [image-face {:style (:img-face styles)}
-       [image (:img-view styles) (:img styles) sprites]]
-      [:> rn/ScrollView {:style (:info-list styles)}
-       [species-info flavour-text-entries weight height]
-       [abilities-info type abilities]
-       [base-stats-info type stats]]])))
+(defn pokemon-info
+  "Detailed pokémon information component."
+  [{:keys [route]}]
+  (let [id (.. route -params -id)]
+    (fn []
+      (let [{:keys [abilities types sprites stats weight height]} (sub-pokemon id)
+            {flavour-text-entries :flavor_text_entries} (sub-specie id)
+            type (first (map (comp :name :type) types))]
+        [:> rn/View {:style (modify-style (:container styles) type)}
+         [image-face {:style (:img-face styles)}
+          [image (:img-view styles) (:img styles) sprites]]
+         [:> rn/ScrollView {:style (:info-list styles)}
+          (if flavour-text-entries
+            [species-info flavour-text-entries weight height]
+            [skeleton {:style {:align-items :center
+                               :margin-top 10
+                               :background-color :white}
+                       :bar-style {:background-color :#7776}
+                       :bar-count 6
+                       :bar-spacing 10}])
+          [abilities-info type abilities]
+          [base-stats-info type stats]]]))))

@@ -1,10 +1,11 @@
 (ns pokedex.view.home
+  "The root component module where the app navigation logic lives."
   (:require
    ["expo-constants" :as c]
    ["@react-navigation/native" :as n]
    ["@react-navigation/stack" :as stack]
    [pokedex.view.card-list :refer [card-list]]
-   [pokedex.view.info-component :refer [info-component]]
+   [pokedex.view.info.pokemon-info :refer [pokemon-info]]
    [reagent.core :as r]
    [clojure.string :as s]))
 
@@ -32,7 +33,7 @@
                 :component (r/reactify-component card-list)
                 :options {:title "Pokédex"}}]
     [:> Screen {:name "Details"
-                :component (r/reactify-component info-component)
+                :component (r/reactify-component pokemon-info)
                 :options (fn [^js/Object obj]
                            (let [name (s/capitalize (.. obj -route -params -name))]
                              #js {:title name
